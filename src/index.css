@@ -12,6 +12,9 @@ code {
     monospace;
 }
 
+label {
+  font-weight: 600;
+}
 /* Change outline color on focus */
 input,
 select {

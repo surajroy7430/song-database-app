@@ -10,7 +10,6 @@ const useSong = () => {
     download: "",
     duration: "",
     released: "",
-    images: [{ quality: "50x50", imageUrl: "" }],
     imageUri: "",
     genre: [],
     type: ["mp3"],
@@ -27,27 +26,6 @@ const useSong = () => {
       ...prevSong,
       [name]: name === "released" ? Number(value) : value,
     }));
-  };
-
-  const handleImageChange = (index, e) => {
-    const { name, value } = e.target;
-    const updatedImages = [...song.images];
-    updatedImages[index][name] = value;
-    setSong({ ...song, images: updatedImages });
-  };
-
-  const addImageField = () => {
-    setSong((prevSong) => ({
-      ...prevSong,
-      images: [...prevSong.images, { quality: "50x50", imageUrl: "" }],
-    }));
-  };
-
-  const removeImageField = (index) => {
-    if (song.images.length > 1) {
-      const updatedImages = song.images.filter((_, i) => i !== index);
-      setSong({ ...song, images: updatedImages });
-    }
   };
 
   const addGenre = () => {
@@ -110,9 +88,6 @@ const useSong = () => {
     typeInput,
     setTypeInput,
     handleChange,
-    handleImageChange,
-    addImageField,
-    removeImageField,
     addGenre,
     removeGenre,
     addSongType,

@@ -12,9 +12,6 @@ const AddSongForm = () => {
     typeInput,
     setTypeInput,
     handleChange,
-    handleImageChange,
-    addImageField,
-    removeImageField,
     addGenre,
     removeGenre,
     addSongType,
@@ -54,7 +51,6 @@ const AddSongForm = () => {
         download: "",
         duration: "",
         released: "",
-        images: [{ quality: "50x50", imageUrl: "" }],
         imageUri: "",
         genre: [],
         type: ["mp3"],
@@ -193,49 +189,10 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="images" className="form-label">Images</label>
-          {song.images.map((img, index) => (
-            <div key={index} className="d-flex mb-2">
-              <select
-                name="quality"
-                value={img.quality}
-                onChange={(e) => handleImageChange(index, e)}
-                className="form-select me-2"
-              >
-                <option value="" disabled>Image Quality</option>
-                <option value="50x50">50x50</option>
-                <option value="150x150">150x150</option>
-                <option value="500x500">500x500</option>
-              </select>
-              <input
-                type="text"
-                name="imageUrl"
-                value={img.imageUrl}
-                onChange={(e) => handleImageChange(index, e)}
-                placeholder="Image URL"
-                className="form-control me-2"
-              />
-              {index > 0 && (
-                <button type="button" className="btn btn-danger" onClick={() => removeImageField(index)}>
-                  X
-                </button>
-              )}
-            </div>
-          ))}
-
-          <button
-            type="button"
-            className="btn btn-secondary mt-2"
-            onClick={addImageField}
-          >
-            + Add More
-          </button>
-        </div>
-
-        <div className="mb-3">
           <label htmlFor="imageUri" className="form-label">Image URI</label>
           <input
             type="text"
+            id="imageUri"
             name="imageUri"
             value={song.imageUri}
             onChange={handleChange}
@@ -256,7 +213,7 @@ const AddSongForm = () => {
               className="form-control me-2"
               placeholder="Pop, Rock, Electronic, Bollywood, Classical, Hip-Hop, Jazz, R&B"
             />
-            <button type="button" className="btn btn-secondary" onClick={addGenre}>
+            <button type="button" className="btn btn-success" onClick={addGenre}>
               Add
             </button>
           </div>
@@ -303,7 +260,7 @@ const AddSongForm = () => {
               className="form-control me-2"
               placeholder="mp3, wav, flac, aac, ogg"
             />
-            <button type="button" className="btn btn-secondary" onClick={addSongType}>
+            <button type="button" className="btn btn-success" onClick={addSongType}>
               Add
             </button>
           </div>
