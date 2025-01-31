@@ -3,7 +3,7 @@ import { useState }  from "react";
 const useSong = () => {
   const [song, setSong] = useState({
     title: "",
-    singers: "",
+    singers: [],
     album: "",
     language: "",
     songUri: "",
@@ -16,6 +16,7 @@ const useSong = () => {
     copyright: "",
   });
 
+  const [singerInput, setSingerInput] = useState("");
   const [genreInput, setGenreInput] = useState("");
   const [typeInput, setTypeInput] = useState("");
 
@@ -26,6 +27,21 @@ const useSong = () => {
       ...prevSong,
       [name]: name === "released" ? Number(value) : value,
     }));
+  };
+
+  const addSinger = () => {
+    if (singerInput && !song.singers.includes(singerInput)) {
+      setSong((prevSong) => ({
+        ...prevSong,
+        singers: [...prevSong.singers, singerInput], // Push singers into array
+      }));
+      setSingerInput("");
+    }
+  };
+
+  const removeSinger = (index) => {
+    const updatedSingers = song.singers.filter((_, i) => i !== index);
+    setSong({ ...song, singers: updatedSingers });
   };
 
   const addGenre = () => {
@@ -83,6 +99,10 @@ const useSong = () => {
   return {
     song,
     setSong,
+    singerInput,
+    setSingerInput,
+    addSinger,
+    removeSinger,
     genreInput,
     setGenreInput,
     typeInput,

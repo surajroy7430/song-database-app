@@ -7,6 +7,10 @@ const AddSongForm = () => {
   const {
     song,
     setSong,
+    singerInput,
+    setSingerInput,
+    addSinger,
+    removeSinger,
     genreInput,
     setGenreInput,
     typeInput,
@@ -86,16 +90,49 @@ const AddSongForm = () => {
 
         <div className="mb-3">
           <label htmlFor="singers" className="form-label">Singers</label>
-          <input
-            type="text"
-            id="singers"
-            name="singers"
-            value={song.singers}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Enter Singer Names (required)"
-            required
-          />
+          <div className="d-flex mb-2">
+            <input
+              type="text"
+              id="singers"
+              name="singers"
+              value={singerInput}
+              onChange={(e) => setSingerInput(e.target.value)}
+              className="form-control me-2"
+              placeholder="Enter Singer Names (required)"
+            />
+            <button type="button" className="btn btn-success" onClick={addSinger}>
+              Add
+            </button>
+          </div>
+
+          {song.singers.length === 0 ? "" :
+            <div className="table-container">
+              <table className="table table-bordered border-secondary table-striped">
+                <thead className="table-dark">
+                  <tr>
+                    <th>Singer Names</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {song.singers.map((sing, index) => (
+                    <tr key={index}>
+                      <td className="align-middle">{sing}</td>
+                      <td className="align-middle">
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          onClick={() => removeSinger(index)}
+                        >
+                          X
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
 
         <div className="mb-3">
