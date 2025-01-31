@@ -396,33 +396,32 @@ const AddSongForm = () => {
           {song.lyricsData.hasLyrics && (
             <>
 
-            <div className="mb-3">
-            {song.lyricsData.lyrics.map((section, index) => (
-            <div key={index} className="mb-3">
-              <select 
-                value={section.melody} 
-                className="form-select"
-                onChange={(e) => handleLyricTypeChange(index, e.target.value)}
-              >
-                <option value="verse">Verse</option>
-                <option value="chorus">Chorus</option>
-                <option value="hook">Hook</option>
-                <option value="outro">Outro</option>
-              </select>
-              <textarea
-                id="lyrics"
-                value={section.lyricsText.join("\n")}
-                className="form-control"
-                style={{margin: "10px auto"}}
-                onChange={(e) => handleLyricChange(index, e.target.value)}
-                placeholder={`Enter "${section.melody}" lyrics`}
-                rows="3"
-              />
-              <button type="button" className="btn btn-danger" onClick={() => removeLyricSection(index)}>Remove</button>
-            </div>
-          ))}
-          <button type="button" className="btn btn-success" onClick={addLyricSection}>+ Add Lyrics Melody</button>
-          </div>
+              <div className="mb-3">
+                {song.lyricsData.lyrics.map((section, index) => (
+                  <div key={index} className="mb-3">
+                    <input
+                      type="text"
+                      id="lyricsType"
+                      name="lyricsType"
+                      value={section.melody}
+                      onChange={(e) => handleLyricTypeChange(index, e.target.value)}
+                      className="form-control capitalize"
+                      placeholder="Enter melody type"
+                    />
+                    <textarea
+                      id="lyrics"
+                      value={section.lyricsText.join("\n")}
+                      className="form-control"
+                      style={{ margin: "10px auto" }}
+                      onChange={(e) => handleLyricChange(index, e.target.value)}
+                      placeholder={`Enter "${section.melody}" lyrics`}
+                      rows="3"
+                    />
+                    <button type="button" className="btn btn-danger" onClick={() => removeLyricSection(index)}>Remove</button>
+                  </div>
+                ))}
+                <button type="button" className="btn btn-success" onClick={addLyricSection}>+ Add Lyrics Melody</button>
+              </div>
 
               <div className="mb-3">
                 <label htmlFor="writers" className="form-label">Writer(s)</label>
