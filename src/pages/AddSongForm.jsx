@@ -414,7 +414,7 @@ const AddSongForm = () => {
                       className="form-control"
                       style={{ margin: "10px auto" }}
                       onChange={(e) => handleLyricChange(index, e.target.value)}
-                      placeholder={`Enter "${section.melody}" lyrics`}
+                      placeholder={`Enter ${section.melody} lyrics`}
                       rows="3"
                     />
                     <button type="button" className="btn btn-danger" onClick={() => removeLyricSection(index)}>Remove</button>
