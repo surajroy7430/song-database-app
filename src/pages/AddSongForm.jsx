@@ -26,13 +26,23 @@ const AddSongForm = () => {
     e.preventDefault();
 
     try {
+      const languageCollections = {
+        English: "english",
+        Hindi: "hindi",
+        Telugu: "telugu",
+        Tamil: "tamil",
+        Bengali: "bengali"
+      }
+
+      const collectionName = languageCollections[song.language]
+
       const docRef = await addDoc(
-        collection(db, song.language === "English" ? "english" : "hindi"),
+        collection(db, collectionName),
         song
       );
       await updateDoc(docRef, { id: docRef.id });
 
-      toast.success(`${song.title} added successfully`);
+      toast.success(`${song.title} added in ${song.language}`);
       console.log(`${song.title} - song added with ID: ${docRef.id}`);
 
       setSong({
@@ -119,6 +129,9 @@ const AddSongForm = () => {
             <option value="" disabled>Select Language</option>
             <option value="English">English</option>
             <option value="Hindi">Hindi</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Bengali">Bengali</option>
           </select>
         </div>
 
