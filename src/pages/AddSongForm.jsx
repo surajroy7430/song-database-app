@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from 'react-toastify';
-import { db, collection, addDoc, updateDoc, doc, getDoc, setDoc, arrayUnion } from "../firebase";
+import { db, collection, addDoc, writeBatch, doc, arrayUnion } from "../firebase";
 import useSong from "../hooks/useSong";
 
 const AddSongForm = () => {
@@ -21,14 +21,19 @@ const AddSongForm = () => {
     addSongType,
     removeSongType,
     handleDurationChange,
-    toggleHasLyrics,
-    handleLyricsChange,
+    handleToggleLyrics,
+    handleLyricChange,
+    handleLyricTypeChange,
+    addLyricSection,
+    removeLyricSection,
+    handleLyricsKeyChange,
   } = useSong();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      const batch = writeBatch(db);
       const languageCollections = {
         English: "english",
         Hindi: "hindi",
@@ -44,43 +49,25 @@ const AddSongForm = () => {
         song
       );
       const songWithId = { ...song, id: docRef.id };
-      await updateDoc(docRef, { id: docRef.id });
+      batch.update(docRef, { id: docRef.id });
 
       // Add to Albums collection if the album already exists
       if (song.album) {
         const albumRef = doc(db, "albums", song.album);
-        const albumDoc = await getDoc(albumRef);
-        if (albumDoc.exists()) {
-          // If the album exists, update the results array with the new song
-          await updateDoc(albumRef, {
-            results: arrayUnion({ ...songWithId }),
-          });
-        } else {
-          // If the album doesn't exist, create a new album entry with the song
-          await setDoc(albumRef, {
-            results: [{ ...songWithId }],
-          });
-        }
+        batch.set(albumRef, { results: arrayUnion(songWithId) }, { merge: true });
       }
 
-      // Add to Singers collection if the singer(s) already exist
-      if (song.singers.length > 0) {
-        for (const singer of song.singers) {
-          const singerRef = doc(db, "singers", singer);
-          const singerDoc = await getDoc(singerRef);
-          if (singerDoc.exists()) {
-            // If the singer exists, update the results array with the new song
-            await updateDoc(singerRef, {
-              results: arrayUnion({ ...songWithId }),
-            });
-          } else {
-            // If the singer doesn't exist, create a new singer entry with the song
-            await setDoc(singerRef, {
-              results: [{ ...songWithId }],
-            });
-          }
-        }
+      for (const singer of song.singers) {
+        const singerRef = doc(db, "singers", singer);
+        batch.set(singerRef, { results: arrayUnion(songWithId) }, { merge: true });
       }
+
+      for (const gen of song.genre) {
+        const genreRef = doc(db, "genre", gen);
+        batch.set(genreRef, { results: arrayUnion(songWithId) }, { merge: true });
+      }
+
+      await batch.commit();
 
       toast.success(`${song.title} added in ${song.language}`);
       console.log(`${song.title} - song added with ID: ${docRef.id}`);
@@ -100,7 +87,7 @@ const AddSongForm = () => {
         copyright: "",
         lyricsData: {
           hasLyrics: false,
-          lyrics: "",
+          lyrics: [],
           writers: "",
           poweredBy: "",
         },
@@ -399,7 +386,7 @@ const AddSongForm = () => {
               id="lyricsToggle"
               className="form-check-input"
               checked={song.lyricsData.hasLyrics}
-              onChange={toggleHasLyrics}
+              onChange={handleToggleLyrics}
             />
             <label className="form-check-label" htmlFor="lyricsToggle">
               Song has lyrics?
@@ -409,17 +396,33 @@ const AddSongForm = () => {
           {song.lyricsData.hasLyrics && (
             <>
 
-              <div className="mb-3">
-                <label htmlFor="lyrics" className="form-label">Song Lyrics</label>
-                <textarea
-                  id="lyrics"
-                  name="lyrics"
-                  value={song.lyricsData.lyrics}
-                  onChange={handleLyricsChange}
-                  className="form-control"
-                  placeholder="Enter lyrics here"
-                />
-              </div>
+            <div className="mb-3">
+            {song.lyricsData.lyrics.map((section, index) => (
+            <div key={index} className="mb-3">
+              <select 
+                value={section.melody} 
+                className="form-select"
+                onChange={(e) => handleLyricTypeChange(index, e.target.value)}
+              >
+                <option value="verse">Verse</option>
+                <option value="chorus">Chorus</option>
+                <option value="hook">Hook</option>
+                <option value="outro">Outro</option>
+              </select>
+              <textarea
+                id="lyrics"
+                value={section.lyricsText.join("\n")}
+                className="form-control"
+                style={{margin: "10px auto"}}
+                onChange={(e) => handleLyricChange(index, e.target.value)}
+                placeholder={`Enter "${section.melody}" lyrics`}
+                rows="3"
+              />
+              <button type="button" className="btn btn-danger" onClick={() => removeLyricSection(index)}>Remove</button>
+            </div>
+          ))}
+          <button type="button" className="btn btn-success" onClick={addLyricSection}>+ Add Lyrics Melody</button>
+          </div>
 
               <div className="mb-3">
                 <label htmlFor="writers" className="form-label">Writer(s)</label>
@@ -427,8 +430,8 @@ const AddSongForm = () => {
                   type="text"
                   id="writers"
                   name="writers"
-                  value={song.lyricsData.writers}
-                  onChange={handleLyricsChange}
+                  value={song.lyricsData?.writers || ""}
+                  onChange={handleLyricsKeyChange}
                   className="form-control capitalize"
                   placeholder="Enter Writer Names"
                 />
@@ -440,8 +443,8 @@ const AddSongForm = () => {
                   type="url"
                   id="poweredBy"
                   name="poweredBy"
-                  value={song.lyricsData.poweredBy}
-                  onChange={handleLyricsChange}
+                  value={song.lyricsData?.poweredBy || ""}
+                  onChange={handleLyricsKeyChange}
                   className="form-control"
                   placeholder="Enter URL (eg. https://www.musixmatch.com/)"
                 />

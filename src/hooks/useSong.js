@@ -16,7 +16,7 @@ const useSong = () => {
     copyright: "",
     lyricsData: {
       hasLyrics: false,
-      lyrics: "",
+      lyrics: [],
       writers: "",
       poweredBy: "",
     },
@@ -103,22 +103,70 @@ const useSong = () => {
   };
 
   // Lyrics handling
-  const toggleHasLyrics = () => {
+  const handleToggleLyrics = (e) => {
     setSong((prevSong) => ({
       ...prevSong,
+
       lyricsData: {
         ...prevSong.lyricsData,
-        hasLyrics: !prevSong.lyricsData.hasLyrics,
+        hasLyrics: e.target.checked,
+        lyrics: e.target.checked ? [{ melody: "verse", lyricsText: [""] }] : [],
       },
     }));
   };
 
-  const handleLyricsChange = (e) => {
+  const handleLyricChange = (index, value) => {
+    const updatedLyrics = [...song.lyricsData.lyrics];
+
+    updatedLyrics[index].lyricsText = value.split("\n");
+
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: { ...prevSong.lyricsData, lyrics: updatedLyrics },
+    }));
+  };
+
+  const handleLyricTypeChange = (index, value) => {
+    const updatedLyrics = [...song.lyricsData.lyrics];
+
+    updatedLyrics[index].melody = value;
+
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: { ...prevSong.lyricsData, lyrics: updatedLyrics },
+    }));
+  };
+
+  const addLyricSection = () => {
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: {
+        ...prevSong.lyricsData,
+        lyrics: [
+          ...prevSong.lyricsData.lyrics,
+          { melody: "verse", lyricsText: [""] },
+        ],
+      },
+    }));
+  };
+
+  const removeLyricSection = (index) => {
+    const updatedLyrics = song.lyricsData.lyrics.filter((_, i) => i !== index);
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: { ...prevSong.lyricsData, lyrics: updatedLyrics },
+    }));
+  };
+
+  const handleLyricsKeyChange = (e) => {
     const { name, value } = e.target;
 
     setSong((prevSong) => ({
       ...prevSong,
-      lyricsData: { ...prevSong.lyricsData, [name]: value },
+      lyricsData: {
+        ...prevSong.lyricsData,
+        [name]: value,
+      },
     }));
   };
 
@@ -139,8 +187,12 @@ const useSong = () => {
     addSongType,
     removeSongType,
     handleDurationChange,
-    toggleHasLyrics,
-    handleLyricsChange,
+    handleToggleLyrics,
+    handleLyricChange,
+    handleLyricTypeChange,
+    addLyricSection,
+    removeLyricSection,
+    handleLyricsKeyChange,
   };
 };
 
