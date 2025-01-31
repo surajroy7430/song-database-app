@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from 'react-toastify';
-import { db, collection, addDoc, updateDoc } from "../firebase/firebase-config";
+import { db, collection, addDoc, updateDoc } from "../firebase";
 import useSong from "../hooks/useSong";
 
 const AddSongForm = () => {
