@@ -21,6 +21,8 @@ const AddSongForm = () => {
     addSongType,
     removeSongType,
     handleDurationChange,
+    toggleHasLyrics,
+    handleLyricsChange,
   } = useSong();
 
   const handleSubmit = async (e) => {
@@ -59,6 +61,7 @@ const AddSongForm = () => {
         genre: [],
         type: ["mp3"],
         copyright: "",
+        lyricsData: { hasLyrics: false, lyrics: "" },
       });
 
     } catch (e) {
@@ -344,6 +347,33 @@ const AddSongForm = () => {
             placeholder="Enter Copyright"
           // required
           />
+        </div>
+
+        {/* Lyrics Section */}
+        <div className="mb-3">
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              id="lyricsToggle"
+              className="form-check-input"
+              checked={song.lyricsData.hasLyrics}
+              onChange={toggleHasLyrics}
+            />
+            <label className="form-check-label" htmlFor="lyricsToggle">
+              Song has lyrics
+            </label>
+          </div>
+          {song.lyricsData.hasLyrics && (
+            <textarea
+              id="lyrics"
+              name="lyrics"
+              value={song.lyricsData.lyrics}
+              onChange={handleLyricsChange}
+              className="form-control"
+              placeholder="Enter Lyrics Here"
+              rows="4"
+            />
+          )}
         </div>
 
         <div className="d-flex justify-content-center mt-5">

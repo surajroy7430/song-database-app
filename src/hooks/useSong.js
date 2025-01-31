@@ -1,4 +1,4 @@
-import { useState }  from "react";
+import { useState } from "react";
 
 const useSong = () => {
   const [song, setSong] = useState({
@@ -14,6 +14,7 @@ const useSong = () => {
     genre: [],
     type: ["mp3"],
     copyright: "",
+    lyricsData: { hasLyrics: false, lyrics: "" },
   });
 
   const [singerInput, setSingerInput] = useState("");
@@ -96,6 +97,26 @@ const useSong = () => {
     }));
   };
 
+  // Lyrics handling
+  const toggleHasLyrics = () => {
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: {
+        ...prevSong.lyricsData,
+        hasLyrics: !prevSong.lyricsData.hasLyrics,
+      },
+    }));
+  };
+
+  const handleLyricsChange = (e) => {
+    const { name, value } = e.target;
+
+    setSong((prevSong) => ({
+      ...prevSong,
+      lyricsData: { ...prevSong.lyricsData, [name]: value },
+    }));
+  };
+
   return {
     song,
     setSong,
@@ -113,6 +134,8 @@ const useSong = () => {
     addSongType,
     removeSongType,
     handleDurationChange,
+    toggleHasLyrics,
+    handleLyricsChange,
   };
 };
 
