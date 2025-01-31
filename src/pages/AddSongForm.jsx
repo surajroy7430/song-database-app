@@ -48,7 +48,7 @@ const AddSongForm = () => {
 
       setSong({
         title: "",
-        singers: "",
+        singers: [],
         album: "",
         language: "",
         songUri: "",
