@@ -15,6 +15,9 @@ code {
 label {
   font-weight: 600;
 }
+.capitalize {
+  text-transform: capitalize;
+}
 /* Change outline color on focus */
 input,
 select {

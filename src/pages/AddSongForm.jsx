@@ -97,7 +97,7 @@ const AddSongForm = () => {
               name="singers"
               value={singerInput}
               onChange={(e) => setSingerInput(e.target.value)}
-              className="form-control me-2"
+              className="form-control me-2 capitalize"
               placeholder="Enter Singer Names (required)"
             />
             <button type="button" className="btn btn-success" onClick={addSinger}>
@@ -143,7 +143,7 @@ const AddSongForm = () => {
             name="album"
             value={song.album}
             onChange={handleChange}
-            className="form-control"
+            className="form-control capitalize"
             placeholder="Enter Album Name"
           // required
           />
@@ -247,7 +247,7 @@ const AddSongForm = () => {
               name="genre"
               value={genreInput}
               onChange={(e) => setGenreInput(e.target.value)}
-              className="form-control me-2"
+              className="form-control me-2 capitalize"
               placeholder="Pop, Rock, Electronic, Bollywood, Classical, Hip-Hop, Jazz, R&B"
             />
             <button type="button" className="btn btn-success" onClick={addGenre}>
