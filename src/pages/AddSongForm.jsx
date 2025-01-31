@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from 'react-toastify';
-import { db, collection, addDoc, updateDoc } from "../firebase";
+import { db, collection, addDoc, updateDoc, doc, getDoc, setDoc, arrayUnion } from "../firebase";
 import useSong from "../hooks/useSong";
 
 const AddSongForm = () => {
@@ -43,7 +43,44 @@ const AddSongForm = () => {
         collection(db, collectionName),
         song
       );
+      const songWithId = { ...song, id: docRef.id };
       await updateDoc(docRef, { id: docRef.id });
+
+      // Add to Albums collection if the album already exists
+      if (song.album) {
+        const albumRef = doc(db, "albums", song.album);
+        const albumDoc = await getDoc(albumRef);
+        if (albumDoc.exists()) {
+          // If the album exists, update the results array with the new song
+          await updateDoc(albumRef, {
+            results: arrayUnion({ ...songWithId }),
+          });
+        } else {
+          // If the album doesn't exist, create a new album entry with the song
+          await setDoc(albumRef, {
+            results: [{ ...songWithId }],
+          });
+        }
+      }
+
+      // Add to Singers collection if the singer(s) already exist
+      if (song.singers.length > 0) {
+        for (const singer of song.singers) {
+          const singerRef = doc(db, "singers", singer);
+          const singerDoc = await getDoc(singerRef);
+          if (singerDoc.exists()) {
+            // If the singer exists, update the results array with the new song
+            await updateDoc(singerRef, {
+              results: arrayUnion({ ...songWithId }),
+            });
+          } else {
+            // If the singer doesn't exist, create a new singer entry with the song
+            await setDoc(singerRef, {
+              results: [{ ...songWithId }],
+            });
+          }
+        }
+      }
 
       toast.success(`${song.title} added in ${song.language}`);
       console.log(`${song.title} - song added with ID: ${docRef.id}`);
@@ -61,7 +98,12 @@ const AddSongForm = () => {
         genre: [],
         type: ["mp3"],
         copyright: "",
-        lyricsData: { hasLyrics: false, lyrics: "" },
+        lyricsData: {
+          hasLyrics: false,
+          lyrics: "",
+          writers: "",
+          poweredBy: "",
+        },
       });
 
     } catch (e) {
@@ -360,19 +402,52 @@ const AddSongForm = () => {
               onChange={toggleHasLyrics}
             />
             <label className="form-check-label" htmlFor="lyricsToggle">
-              Song has lyrics
+              Song has lyrics?
             </label>
           </div>
+
           {song.lyricsData.hasLyrics && (
-            <textarea
-              id="lyrics"
-              name="lyrics"
-              value={song.lyricsData.lyrics}
-              onChange={handleLyricsChange}
-              className="form-control"
-              placeholder="Enter Lyrics Here"
-              rows="4"
-            />
+            <>
+
+              <div className="mb-3">
+                <label htmlFor="lyrics" className="form-label">Song Lyrics</label>
+                <textarea
+                  id="lyrics"
+                  name="lyrics"
+                  value={song.lyricsData.lyrics}
+                  onChange={handleLyricsChange}
+                  className="form-control"
+                  placeholder="Enter lyrics here"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="writers" className="form-label">Writer(s)</label>
+                <input
+                  type="text"
+                  id="writers"
+                  name="writers"
+                  value={song.lyricsData.writers}
+                  onChange={handleLyricsChange}
+                  className="form-control capitalize"
+                  placeholder="Enter Writer Names"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="poweredBy" className="form-label">Lyrics Powered By (URL)</label>
+                <input
+                  type="url"
+                  id="poweredBy"
+                  name="poweredBy"
+                  value={song.lyricsData.poweredBy}
+                  onChange={handleLyricsChange}
+                  className="form-control"
+                  placeholder="Enter URL (eg. https://www.musixmatch.com/)"
+                />
+              </div>
+
+            </>
           )}
         </div>
 

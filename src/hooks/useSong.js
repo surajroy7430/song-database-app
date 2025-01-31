@@ -14,7 +14,12 @@ const useSong = () => {
     genre: [],
     type: ["mp3"],
     copyright: "",
-    lyricsData: { hasLyrics: false, lyrics: "" },
+    lyricsData: {
+      hasLyrics: false,
+      lyrics: "",
+      writers: "",
+      poweredBy: "",
+    },
   });
 
   const [singerInput, setSingerInput] = useState("");
