@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, writeBatch, doc, arrayUnion } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDoc, writeBatch, doc, arrayUnion } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,4 +19,4 @@ console.log(process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID + "I9f928e863r22g
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export { db, collection, addDoc, writeBatch, doc, arrayUnion };
+export { db, collection, addDoc, getDoc, writeBatch, doc, arrayUnion };

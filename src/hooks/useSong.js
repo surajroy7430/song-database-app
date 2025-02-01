@@ -1,4 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const capitalizeWords = (str) => {
+  return str
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
 const useSong = () => {
   const [song, setSong] = useState({
@@ -11,6 +18,7 @@ const useSong = () => {
     duration: "",
     released: "",
     imageUri: "",
+    playCount: "",
     genre: [],
     type: ["mp3"],
     copyright: "",
@@ -20,6 +28,10 @@ const useSong = () => {
       writers: "",
       poweredBy: "",
     },
+    descriptionData: {
+      about: "",
+      description: "",
+    }
   });
 
   const [singerInput, setSingerInput] = useState("");
@@ -31,15 +43,19 @@ const useSong = () => {
 
     setSong((prevSong) => ({
       ...prevSong,
-      [name]: name === "released" ? Number(value) : value,
+      [name]: name === "released" ? Number(value.replace(/\D/g, "").slice(0, 4)) : 
+              name === "playCount" ? Number(value.replace(/\D/g, "")) : 
+              name === "album" ? capitalizeWords(value) : 
+              name === "writers" ? capitalizeWords(value) : 
+              value,
     }));
   };
 
   const addSinger = () => {
-    if (singerInput && !song.singers.includes(singerInput)) {
+    if (singerInput && !song.singers.includes(capitalizeWords(singerInput))) {
       setSong((prevSong) => ({
         ...prevSong,
-        singers: [...prevSong.singers, singerInput], // Push singers into array
+        singers: [...prevSong.singers, capitalizeWords(singerInput)], // Push singers into array
       }));
       setSingerInput("");
     }
@@ -51,10 +67,10 @@ const useSong = () => {
   };
 
   const addGenre = () => {
-    if (genreInput && !song.genre.includes(genreInput)) {
+    if (genreInput && !song.genre.includes(capitalizeWords(genreInput))) {
       setSong((prevSong) => ({
         ...prevSong,
-        genre: [...prevSong.genre, genreInput], // Push genre into array
+        genre: [...prevSong.genre, capitalizeWords(genreInput)], // Push genre into array
       }));
       setGenreInput("");
     }
@@ -169,6 +185,47 @@ const useSong = () => {
       },
     }));
   };
+
+  useEffect(() => {
+    const { title, language, singers, album, released, duration } = song;
+
+    setSong((prevSong) => ({
+      ...prevSong,
+      descriptionData: {
+        about: `About ${title}`,
+        description: 
+        `Listen to ${title} online. 
+        ${title} is a ${language} language song and is sung by ${singers.join(', ')}. 
+        ${title}, from the album ${album}, was released in the year ${released}. 
+        The duration of the song is ${duration}. Download this song and enjoy.`,
+      },
+    }));
+  }, [song]);
+
+  // Auto-increment playCount every day (AFTER adding to the database)
+  useEffect(() => {
+    if (typeof song.playCount === "number" && song.playCount >= 0) {
+      const updatePlayCount = () => {
+        setSong((prevSong) => ({
+          ...prevSong,
+          playCount: prevSong.playCount + 1,
+        }));
+      };
+
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+
+      const initialDelay = midnight - now;
+
+      const firstTimeout = setTimeout(() => {
+        updatePlayCount();
+        setInterval(updatePlayCount, 24 * 60 * 60 * 1000);
+      }, initialDelay);
+
+      return () => clearTimeout(firstTimeout);
+    }
+  }, [song.playCount]);
 
   return {
     song,

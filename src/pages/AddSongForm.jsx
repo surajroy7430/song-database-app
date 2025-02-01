@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from 'react-toastify';
-import { db, collection, addDoc, writeBatch, doc, arrayUnion } from "../firebase";
+import { db, collection, addDoc, getDoc, writeBatch, doc, arrayUnion } from "../firebase";
 import useSong from "../hooks/useSong";
 
 const AddSongForm = () => {
@@ -42,7 +42,7 @@ const AddSongForm = () => {
         Bengali: "bengali"
       }
 
-      const collectionName = languageCollections[song.language]
+      const collectionName = languageCollections[song.language];
 
       const docRef = await addDoc(
         collection(db, collectionName),
@@ -54,7 +54,31 @@ const AddSongForm = () => {
       // Add to Albums collection if the album already exists
       if (song.album) {
         const albumRef = doc(db, "albums", song.album);
-        batch.set(albumRef, { results: arrayUnion(songWithId) }, { merge: true });
+        const albumSnapshot = await getDoc(albumRef);
+        const singerList = song.singers.slice(0, 3).join(", "); // Get first 3 singers
+        const otherSingers = song.singers.length > 3 ? "and more" : ""; // If more than 3 singers
+        let songCount = 0;
+
+        if (albumSnapshot.exists() && albumSnapshot.data().results) {
+          songCount = albumSnapshot.data().results.length + 1; // Add the new song
+        } else {
+          songCount = 1; // First song in the album
+        }
+
+        const songText = songCount === 1 ? "song" : "songs";
+        const albumDescription = {
+          about: `About ${song.album}`,
+          description: 
+          `${song.album} is a ${song.language} album released in ${song.released}. 
+          There are a total of ${songCount} ${songText} in ${song.album}. 
+          The songs were composed by talented musicians such as ${singerList} ${otherSingers}.
+          Listen to all of ${song.album} songs online.`,
+        };
+
+        batch.set(albumRef, { 
+          results: arrayUnion(songWithId), 
+          descriptionData: albumDescription
+        }, { merge: true });
       }
 
       for (const singer of song.singers) {
@@ -82,6 +106,7 @@ const AddSongForm = () => {
         duration: "",
         released: "",
         imageUri: "",
+        playCount: "",
         genre: [],
         type: ["mp3"],
         copyright: "",
@@ -91,6 +116,10 @@ const AddSongForm = () => {
           writers: "",
           poweredBy: "",
         },
+        descriptionData: {
+          about: "",
+          description: "",
+        }
       });
 
     } catch (e) {
@@ -267,6 +296,19 @@ const AddSongForm = () => {
             onChange={handleChange}
             placeholder="Image URI"
             className="form-control"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="playCount" className="form-label">Play Count</label>
+          <input
+            type="number"
+            id="playCount"
+            name="playCount"
+            value={song.playCount}
+            onChange={handleChange}
+            className="form-control"
+            placeholder="Enter Play Count"
           />
         </div>
 
