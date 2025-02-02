@@ -44,7 +44,7 @@ const AddSongForm = () => {
 
       const collectionName = languageCollections[song.language];
 
-      // Get today's date in DD-MM-YYYY format
+      // Get today's date in DD-MMM-YYYY format
     const today = new Date();
     const formattedDate = today.toLocaleString("en-GB", { 
       day: "2-digit", 
@@ -54,23 +54,35 @@ const AddSongForm = () => {
 
       const docRef = await addDoc(
         collection(db, collectionName),
-        { ...song, formattedDate }
+        song
       );
-      const songWithId = { ...song, id: docRef.id, dateCreated: formattedDate };
+      const songWithId = { ...song, id: docRef.id };
       batch.update(docRef, { id: docRef.id });
+      batch.update(docRef, { dateCreated: formattedDate });
 
       // Add to Albums collection if the album already exists
       if (song.album) {
         const albumRef = doc(db, "albums", song.album);
         const albumSnapshot = await getDoc(albumRef);
-        const singerList = song.singers.slice(0, 3).join(", "); // Get first 3 singers
-        const otherSingers = song.singers.length > 3 ? "and more" : ""; // If more than 3 singers
 
         let songCount = albumSnapshot.exists() && albumSnapshot.data().results ?
-          albumSnapshot.data().results.length + 1 // Add the new song
-          : 1; // First song in the album
+          albumSnapshot.data().results.length + 1 : 1;
 
         const songText = songCount === 1 ? "song" : "songs";
+
+        const allSingers = new Set(song.singers);
+        if (albumSnapshot.exists() && albumSnapshot.data().results) {
+          albumSnapshot.data().results.forEach(songItem => {
+            songItem.singers.forEach(singer => allSingers.add(singer));
+          });
+        }
+
+        // Convert Set to array and pick 3 random singers
+        const allSingersArray = Array.from(allSingers);
+        const uniqueSingers = allSingersArray.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const singerList = uniqueSingers.join(", "); // Get first 3 singers
+        const otherSingers = allSingersArray.length > 3 ? "and more" : ""; // If more than 3 singers
+
         const albumDescription = {
           about: `About ${song.album}`,
           description: 
@@ -81,19 +93,23 @@ const AddSongForm = () => {
         };
 
         batch.set(albumRef, { 
-          results: arrayUnion(songWithId), 
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }), 
           descriptionData: albumDescription
         }, { merge: true });
       }
 
       for (const singer of song.singers) {
         const singerRef = doc(db, "singers", singer);
-        batch.set(singerRef, { results: arrayUnion(songWithId) }, { merge: true });
+        batch.set(singerRef, { 
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }) }, 
+          { merge: true });
       }
 
       for (const gen of song.genre) {
         const genreRef = doc(db, "genre", gen);
-        batch.set(genreRef, { results: arrayUnion(songWithId) }, { merge: true });
+        batch.set(genreRef, { 
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }) }, 
+          { merge: true });
       }
 
       await batch.commit();
