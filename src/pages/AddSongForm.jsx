@@ -147,7 +147,7 @@ const AddSongForm = () => {
             name="title"
             value={song.title}
             onChange={handleChange}
-            className="form-control"
+            className="form-control capitalize"
             placeholder="Enter Song Name (required)"
             required
           />

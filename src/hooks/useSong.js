@@ -45,8 +45,8 @@ const useSong = () => {
       ...prevSong,
       [name]: name === "released" ? Number(value.replace(/\D/g, "").slice(0, 4)) : 
               name === "playCount" ? Number(value.replace(/\D/g, "")) : 
-              name === "album" ? capitalizeWords(value) : 
-              name === "writers" ? capitalizeWords(value) : 
+              (name === "title" || name === "album" || name === "writers") ? 
+              capitalizeWords(value) : 
               value,
     }));
   };
