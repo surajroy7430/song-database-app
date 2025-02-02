@@ -46,13 +46,17 @@ const AddSongForm = () => {
 
       // Get today's date in DD-MM-YYYY format
     const today = new Date();
-    const dateCreated = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+    const formattedDate = today.toLocaleString("en-GB", { 
+      day: "2-digit", 
+      month: "short", 
+      year: "numeric" 
+    }).replace(",", "");
 
       const docRef = await addDoc(
         collection(db, collectionName),
-        { ...song, dateCreated }
+        { ...song, formattedDate }
       );
-      const songWithId = { ...song, id: docRef.id };
+      const songWithId = { ...song, id: docRef.id, dateCreated: formattedDate };
       batch.update(docRef, { id: docRef.id });
 
       // Add to Albums collection if the album already exists
@@ -61,13 +65,10 @@ const AddSongForm = () => {
         const albumSnapshot = await getDoc(albumRef);
         const singerList = song.singers.slice(0, 3).join(", "); // Get first 3 singers
         const otherSingers = song.singers.length > 3 ? "and more" : ""; // If more than 3 singers
-        let songCount = 0;
 
-        if (albumSnapshot.exists() && albumSnapshot.data().results) {
-          songCount = albumSnapshot.data().results.length + 1; // Add the new song
-        } else {
-          songCount = 1; // First song in the album
-        }
+        let songCount = albumSnapshot.exists() && albumSnapshot.data().results ?
+          albumSnapshot.data().results.length + 1 // Add the new song
+          : 1; // First song in the album
 
         const songText = songCount === 1 ? "song" : "songs";
         const albumDescription = {
