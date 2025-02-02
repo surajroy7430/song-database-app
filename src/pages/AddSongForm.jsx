@@ -50,7 +50,7 @@ const AddSongForm = () => {
       day: "2-digit", 
       month: "short", 
       year: "numeric" 
-    }).replace(",", "");
+    }).replace(/(\d{2}) (\w{3}) (\d{4})/, "$1 $2, $3");
 
       const docRef = await addDoc(
         collection(db, collectionName),
