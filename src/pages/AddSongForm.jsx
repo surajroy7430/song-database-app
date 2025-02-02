@@ -44,9 +44,13 @@ const AddSongForm = () => {
 
       const collectionName = languageCollections[song.language];
 
+      // Get today's date in DD-MM-YYYY format
+    const today = new Date();
+    const dateCreated = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+
       const docRef = await addDoc(
         collection(db, collectionName),
-        song
+        { ...song, dateCreated }
       );
       const songWithId = { ...song, id: docRef.id };
       batch.update(docRef, { id: docRef.id });
