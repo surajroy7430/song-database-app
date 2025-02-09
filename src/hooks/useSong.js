@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 const capitalizeWords = (str) => {
   return str
     .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 };
+
+const getRandomPlayCount = () => Math.floor(Math.random() * (24625 - 5335 + 1)) + 5335;
 
 const useSong = () => {
   const [song, setSong] = useState({
@@ -18,7 +20,7 @@ const useSong = () => {
     duration: "",
     released: "",
     imageUri: "",
-    playCount: "",
+    playCount: getRandomPlayCount(),
     genre: [],
     type: ["mp3"],
     copyright: "",
@@ -31,7 +33,7 @@ const useSong = () => {
     descriptionData: {
       about: "",
       description: "",
-    }
+    },
   });
 
   const [singerInput, setSingerInput] = useState("");
@@ -43,11 +45,10 @@ const useSong = () => {
 
     setSong((prevSong) => ({
       ...prevSong,
-      [name]: name === "released" ? Number(value.replace(/\D/g, "").slice(0, 4)) : 
-              name === "playCount" ? Number(value.replace(/\D/g, "")) : 
-              (name === "title" || name === "album" || name === "writers") ? 
-              capitalizeWords(value) : 
-              value,
+      [name]: name === "released" ? Number(value.replace(/\D/g, "").slice(0, 4))
+          : name === "playCount" ? Number(value.replace(/\D/g, ""))
+          : (name === "title" || name === "album" || name === "writers") ? capitalizeWords(value)
+          : value,
     }));
   };
 
@@ -186,6 +187,13 @@ const useSong = () => {
     }));
   };
 
+  const refreshPlayCount = () => {
+    setSong((prevSong) => ({
+      ...prevSong,
+      playCount: getRandomPlayCount(),
+    }));
+  };
+
   useEffect(() => {
     const { title, language, singers, album, released, duration } = song;
 
@@ -193,39 +201,15 @@ const useSong = () => {
       ...prevSong,
       descriptionData: {
         about: `About ${title}`,
-        description: 
-        `Listen to ${title} online. 
-        ${title} is a ${language} language song and is sung by ${singers.join(', ')}. 
+        description: `Listen to ${title} online. 
+        ${title} is a ${language} language song and is sung by ${singers.join(
+          ", "
+        )}. 
         ${title}, from the album ${album}, was released in the year ${released}. 
         The duration of the song is ${duration}. Download this song and enjoy.`,
       },
     }));
   }, [song]);
-
-  // Auto-increment playCount every day (AFTER adding to the database)
-  useEffect(() => {
-    if (typeof song.playCount === "number" && song.playCount >= 0) {
-      const updatePlayCount = () => {
-        setSong((prevSong) => ({
-          ...prevSong,
-          playCount: prevSong.playCount + 1,
-        }));
-      };
-
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
-
-      const initialDelay = midnight - now;
-
-      const firstTimeout = setTimeout(() => {
-        updatePlayCount();
-        setInterval(updatePlayCount, 24 * 60 * 60 * 1000);
-      }, initialDelay);
-
-      return () => clearTimeout(firstTimeout);
-    }
-  }, [song.playCount]);
 
   return {
     song,
@@ -250,6 +234,8 @@ const useSong = () => {
     addLyricSection,
     removeLyricSection,
     handleLyricsKeyChange,
+    getRandomPlayCount,
+    refreshPlayCount,
   };
 };
 

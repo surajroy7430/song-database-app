@@ -27,6 +27,8 @@ const AddSongForm = () => {
     addLyricSection,
     removeLyricSection,
     handleLyricsKeyChange,
+    getRandomPlayCount,
+    refreshPlayCount,
   } = useSong();
 
   const handleSubmit = async (e) => {
@@ -45,12 +47,12 @@ const AddSongForm = () => {
       const collectionName = languageCollections[song.language];
 
       // Get today's date in DD-MMM-YYYY format
-    const today = new Date();
-    const formattedDate = today.toLocaleString("en-GB", { 
-      day: "2-digit", 
-      month: "short", 
-      year: "numeric" 
-    }).replace(/(\d{2}) (\w{3}) (\d{4})/, "$1 $2, $3");
+      const today = new Date();
+      const formattedDate = today.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }).replace(/(\d{2}) (\w{3}) (\d{4})/, "$1 $2, $3");
 
       const docRef = await addDoc(
         collection(db, collectionName),
@@ -85,30 +87,32 @@ const AddSongForm = () => {
 
         const albumDescription = {
           about: `About ${song.album}`,
-          description: 
-          `${song.album} is a ${song.language} album released in ${song.released}. 
+          description:
+            `${song.album} is a ${song.language} album released in ${song.released}. 
           There are a total of ${songCount} ${songText} in ${song.album}. 
           The songs were composed by talented musicians such as ${singerList} ${otherSingers}.
           Listen to all of ${song.album} songs online.`,
         };
 
-        batch.set(albumRef, { 
-          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }), 
+        batch.set(albumRef, {
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }),
           descriptionData: albumDescription
         }, { merge: true });
       }
 
       for (const singer of song.singers) {
         const singerRef = doc(db, "singers", singer);
-        batch.set(singerRef, { 
-          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }) }, 
+        batch.set(singerRef, {
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate })
+        },
           { merge: true });
       }
 
       for (const gen of song.genre) {
         const genreRef = doc(db, "genre", gen);
-        batch.set(genreRef, { 
-          results: arrayUnion({ ...songWithId, dateCreated: formattedDate }) }, 
+        batch.set(genreRef, {
+          results: arrayUnion({ ...songWithId, dateCreated: formattedDate })
+        },
           { merge: true });
       }
 
@@ -127,7 +131,7 @@ const AddSongForm = () => {
         duration: "",
         released: "",
         imageUri: "",
-        playCount: "",
+        playCount: getRandomPlayCount(),
         genre: [],
         type: ["mp3"],
         copyright: "",
@@ -172,20 +176,18 @@ const AddSongForm = () => {
 
         <div className="mb-3">
           <label htmlFor="singers" className="form-label">Singers</label>
-          <div className="d-flex mb-2">
             <input
               type="text"
               id="singers"
               name="singers"
               value={singerInput}
               onChange={(e) => setSingerInput(e.target.value)}
-              className="form-control me-2 capitalize"
+              className="form-control capitalize mb-2"
               placeholder="Enter Singer Names (required)"
             />
             <button type="button" className="btn btn-success" onClick={addSinger}>
-              Add
+              Add Singer
             </button>
-          </div>
 
           {song.singers.length === 0 ? "" :
             <div className="table-container">
@@ -328,27 +330,33 @@ const AddSongForm = () => {
             name="playCount"
             value={song.playCount}
             onChange={handleChange}
-            className="form-control"
+            className="form-control mb-2"
             placeholder="Enter Play Count"
           />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={refreshPlayCount}
+          >
+            🔄
+          </button>
         </div>
+
 
         <div className="mb-3">
           <label htmlFor="genre" className="form-label">Genre</label>
-          <div className="d-flex mb-2">
             <input
               type="text"
               id="genre"
               name="genre"
               value={genreInput}
               onChange={(e) => setGenreInput(e.target.value)}
-              className="form-control me-2 capitalize"
+              className="form-control mb-2 capitalize"
               placeholder="Pop, Rock, Electronic, Bollywood, Classical, Hip-Hop, Jazz, R&B"
             />
             <button type="button" className="btn btn-success" onClick={addGenre}>
-              Add
+              Add Genre
             </button>
-          </div>
 
           {song.genre.length === 0 ? "" :
             <div className="table-container">
@@ -382,20 +390,18 @@ const AddSongForm = () => {
 
         <div className="mb-4">
           <label htmlFor="type" className="form-label">Song Type</label>
-          <div className="d-flex mb-2">
             <input
               type="text"
               id="type"
               name="type"
               value={typeInput}
               onChange={(e) => setTypeInput(e.target.value)}
-              className="form-control me-2"
+              className="form-control mb-2"
               placeholder="mp3, wav, flac, aac, ogg"
             />
             <button type="button" className="btn btn-success" onClick={addSongType}>
-              Add
+              Add Type
             </button>
-          </div>
 
           {song.type.length === 0 ? "" :
             <div className="table-container">
