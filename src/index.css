@@ -14,17 +14,20 @@ code {
 
 label {
   font-weight: 600;
+  text-transform: uppercase;
 }
 .capitalize {
   text-transform: capitalize;
 }
 /* Change outline color on focus */
-input,
-select {
-  border-color: #0f0f0f; /* Change this to your preferred color */
-  box-shadow: 0 0 0 0.1rem rgba(22, 23, 24, 0.25); /* Optional: Add a shadow effect */
+.form-control:focus {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #3f4142;
 }
-
+.form-control {
+  border-color: #3f4142;
+}
 .table-container{
   width: 60%;
   margin: 0 auto;
@@ -41,6 +44,34 @@ select {
   text-overflow: ellipsis;
   word-wrap: break-word;
 }
+
+.custom-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-tooltip .tooltip-text {
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  text-align: center;
+  padding: 5px 8px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 12px;
+}
+
+.custom-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
 
 
 

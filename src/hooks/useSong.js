@@ -46,9 +46,9 @@ const useSong = () => {
     setSong((prevSong) => ({
       ...prevSong,
       [name]: name === "released" ? Number(value.replace(/\D/g, "").slice(0, 4))
-          : name === "playCount" ? Number(value.replace(/\D/g, ""))
+        : name === "playCount" ? Number(value.replace(/\D/g, ""))
           : (name === "title" || name === "album" || name === "writers") ? capitalizeWords(value)
-          : value,
+            : value,
     }));
   };
 
@@ -127,7 +127,7 @@ const useSong = () => {
       lyricsData: {
         ...prevSong.lyricsData,
         hasLyrics: e.target.checked,
-        lyrics: e.target.checked ? [{ melody: "verse", lyricsText: [""] }] : [],
+        lyrics: e.target.checked ? [""] : [],
       },
     }));
   };
@@ -135,18 +135,7 @@ const useSong = () => {
   const handleLyricChange = (index, value) => {
     const updatedLyrics = [...song.lyricsData.lyrics];
 
-    updatedLyrics[index].lyricsText = value.split("\n");
-
-    setSong((prevSong) => ({
-      ...prevSong,
-      lyricsData: { ...prevSong.lyricsData, lyrics: updatedLyrics },
-    }));
-  };
-
-  const handleLyricTypeChange = (index, value) => {
-    const updatedLyrics = [...song.lyricsData.lyrics];
-
-    updatedLyrics[index].melody = value;
+    updatedLyrics[index] = value;
 
     setSong((prevSong) => ({
       ...prevSong,
@@ -159,10 +148,7 @@ const useSong = () => {
       ...prevSong,
       lyricsData: {
         ...prevSong.lyricsData,
-        lyrics: [
-          ...prevSong.lyricsData.lyrics,
-          { melody: "verse", lyricsText: [""] },
-        ],
+        lyrics: [...prevSong.lyricsData.lyrics, ""],
       },
     }));
   };
@@ -197,46 +183,52 @@ const useSong = () => {
   useEffect(() => {
     const { title, language, singers, album, released, duration } = song;
 
-    setSong((prevSong) => ({
-      ...prevSong,
-      descriptionData: {
-        about: `About ${title}`,
-        description: `Listen to ${title} online. 
-        ${title} is a ${language} language song and is sung by ${singers.join(
-          ", "
-        )}. 
+    const newDescriptionData = {
+      about: `About ${title}`,
+      description: `Listen to ${title} online. 
+        ${title} is a ${language} language song and is sung by ${singers.join(", ")}. 
         ${title}, from the album ${album}, was released in the year ${released}. 
-        The duration of the song is ${duration}. Download this song and enjoy.`,
-      },
-    }));
-  }, [song]);
+        The duration of the song is ${duration}. Listen this song and enjoy.`,
+    };
 
-  return {
-    song,
-    setSong,
-    singerInput,
-    setSingerInput,
-    addSinger,
-    removeSinger,
-    genreInput,
-    setGenreInput,
-    typeInput,
-    setTypeInput,
-    handleChange,
-    addGenre,
-    removeGenre,
-    addSongType,
-    removeSongType,
-    handleDurationChange,
-    handleToggleLyrics,
-    handleLyricChange,
-    handleLyricTypeChange,
-    addLyricSection,
-    removeLyricSection,
-    handleLyricsKeyChange,
-    getRandomPlayCount,
-    refreshPlayCount,
-  };
+    setSong((prevSong) => {
+      if (JSON.stringify(prevSong.descriptionData) === JSON.stringify(newDescriptionData)) {
+        return prevSong; // Avoid unnecessary re-render
+      }
+      
+      return {
+        ...prevSong,
+        descriptionData: newDescriptionData,
+      }
+      
+    });
+}, [song]);
+
+return {
+  song,
+  setSong,
+  singerInput,
+  setSingerInput,
+  addSinger,
+  removeSinger,
+  genreInput,
+  setGenreInput,
+  typeInput,
+  setTypeInput,
+  handleChange,
+  addGenre,
+  removeGenre,
+  addSongType,
+  removeSongType,
+  handleDurationChange,
+  handleToggleLyrics,
+  handleLyricChange,
+  addLyricSection,
+  removeLyricSection,
+  handleLyricsKeyChange,
+  getRandomPlayCount,
+  refreshPlayCount,
+};
 };
 
 export default useSong;

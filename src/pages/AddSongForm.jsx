@@ -23,7 +23,6 @@ const AddSongForm = () => {
     handleDurationChange,
     handleToggleLyrics,
     handleLyricChange,
-    handleLyricTypeChange,
     addLyricSection,
     removeLyricSection,
     handleLyricsKeyChange,
@@ -83,14 +82,14 @@ const AddSongForm = () => {
         const allSingersArray = Array.from(allSingers);
         const uniqueSingers = allSingersArray.sort(() => 0.5 - Math.random()).slice(0, 3);
         const singerList = uniqueSingers.join(", "); // Get first 3 singers
-        const otherSingers = allSingersArray.length > 3 ? "and more" : ""; // If more than 3 singers
+        const otherSingers = allSingersArray.length > 3 ? " and more" : ""; // If more than 3 singers
 
         const albumDescription = {
           about: `About ${song.album}`,
           description:
             `${song.album} is a ${song.language} album released in ${song.released}. 
           There are a total of ${songCount} ${songText} in ${song.album}. 
-          The songs were composed by talented musicians such as ${singerList} ${otherSingers}.
+          The songs were composed by talented musicians such as ${singerList}${otherSingers}.
           Listen to all of ${song.album} songs online.`,
         };
 
@@ -154,14 +153,16 @@ const AddSongForm = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <form onSubmit={handleSubmit} className="p-4 border shadow-sm rounded">
-        <h1 className="d-flex justify-content-center mb-4 fw-bold">ADD A SONG</h1>
+    <div className="container min-vh-100 py-5">
+      <form onSubmit={handleSubmit} className="p-4" autoComplete="off">
+        <h1 className="text-center text-uppercase mb-4 fw-bold">ADD A SONG</h1>
 
-        <hr></hr>
+        <hr />
 
         <div className="mb-3">
-          <label htmlFor="title" className="form-label">Title</label>
+          <label htmlFor="title" className="form-label">
+            Title<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="text"
             id="title"
@@ -169,32 +170,41 @@ const AddSongForm = () => {
             value={song.title}
             onChange={handleChange}
             className="form-control capitalize"
-            placeholder="Enter Song Name (required)"
+            placeholder="Enter Song Name"
             required
           />
         </div>
 
         <div className="mb-3">
-          <label htmlFor="singers" className="form-label">Singers</label>
+          <label htmlFor="singers" className="form-label">
+            Artists<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
+          <div className="input-group mb-2">
+            <button
+              type="button"
+              className="btn btn-secondary input-group-text custom-tooltip"
+              onClick={addSinger}
+            >
+              Add
+            </button>
+
             <input
               type="text"
               id="singers"
               name="singers"
               value={singerInput}
               onChange={(e) => setSingerInput(e.target.value)}
-              className="form-control capitalize mb-2"
-              placeholder="Enter Singer Names (required)"
+              className="form-control capitalize"
+              placeholder="Enter Artists Names"
             />
-            <button type="button" className="btn btn-success" onClick={addSinger}>
-              Add Singer
-            </button>
+          </div>
 
           {song.singers.length === 0 ? "" :
             <div className="table-container">
-              <table className="table table-bordered border-secondary table-striped">
+              <table className="table table-bordered border-secondary table-hover text-center">
                 <thead className="table-dark">
                   <tr>
-                    <th>Singer Names</th>
+                    <th>Artist Names</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -220,7 +230,9 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="album" className="form-label">Album Name</label>
+          <label htmlFor="album" className="form-label">
+            Album Name<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="text"
             id="album"
@@ -234,7 +246,9 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="language" className="form-label">Language</label>
+          <label htmlFor="language" className="form-label">
+            Select Language<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <select
             id="language"
             name="language"
@@ -253,7 +267,9 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="songUri" className="form-label">Song URL</label>
+          <label htmlFor="songUri" className="form-label">
+            Song URL<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="text"
             id="songUri"
@@ -261,13 +277,15 @@ const AddSongForm = () => {
             value={song.songUri}
             onChange={handleChange}
             className="form-control"
-            placeholder="Enter Song Url (required)"
+            placeholder="Enter Song Url"
             required
           />
         </div>
 
         <div className="mb-3">
-          <label htmlFor="download" className="form-label">Download Link</label>
+          <label htmlFor="download" className="form-label">
+            Download Link
+          </label>
           <input
             type="text"
             id="download"
@@ -281,7 +299,9 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="duration" className="form-label">Duration</label>
+          <label htmlFor="duration" className="form-label">
+            Duration<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="text"
             id="duration"
@@ -290,13 +310,15 @@ const AddSongForm = () => {
             onChange={handleDurationChange}
             className="form-control"
             maxLength="5" // Limit to 5 characters: "MM:SS"
-            placeholder="MM:SS (required)"
+            placeholder="MM:SS"
             required
           />
         </div>
 
         <div className="mb-3">
-          <label htmlFor="released" className="form-label">Released Year</label>
+          <label htmlFor="released" className="form-label">
+            Released Year<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="number"
             id="released"
@@ -304,13 +326,15 @@ const AddSongForm = () => {
             value={song.released}
             onChange={handleChange}
             className="form-control"
-            placeholder="Enter Released year (required)"
+            placeholder="Enter Released year"
             required
           />
         </div>
 
         <div className="mb-3">
-          <label htmlFor="imageUri" className="form-label">Image URI</label>
+          <label htmlFor="imageUri" className="form-label">
+            Image URI<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
           <input
             type="text"
             id="imageUri"
@@ -324,43 +348,54 @@ const AddSongForm = () => {
 
         <div className="mb-3">
           <label htmlFor="playCount" className="form-label">Play Count</label>
-          <input
-            type="number"
-            id="playCount"
-            name="playCount"
-            value={song.playCount}
-            onChange={handleChange}
-            className="form-control mb-2"
-            placeholder="Enter Play Count"
-          />
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={refreshPlayCount}
-          >
-            🔄
-          </button>
+          <div className="input-group mb-2">
+            <button
+              type="button"
+              className="btn btn-secondary input-group-text custom-tooltip"
+              onClick={refreshPlayCount}
+            >
+              <i className="bi bi-arrow-clockwise"></i>
+              <span className="tooltip-text">Refresh</span>
+            </button>
+            <input
+              type="number"
+              id="playCount"
+              name="playCount"
+              value={song.playCount}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="Enter Play Count"
+            />
+          </div>
         </div>
 
 
         <div className="mb-3">
-          <label htmlFor="genre" className="form-label">Genre</label>
+          <label htmlFor="genre" className="form-label">
+            Genre<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
+          <div className="input-group mb-2">
+            <button
+              type="button"
+              className="btn btn-secondary input-group-text"
+              onClick={addGenre}
+            >
+              Add
+            </button>
             <input
               type="text"
               id="genre"
               name="genre"
               value={genreInput}
               onChange={(e) => setGenreInput(e.target.value)}
-              className="form-control mb-2 capitalize"
+              className="form-control capitalize"
               placeholder="Pop, Rock, Electronic, Bollywood, Classical, Hip-Hop, Jazz, R&B"
             />
-            <button type="button" className="btn btn-success" onClick={addGenre}>
-              Add Genre
-            </button>
+          </div>
 
           {song.genre.length === 0 ? "" :
             <div className="table-container">
-              <table className="table table-bordered border-secondary table-striped">
+              <table className="table table-bordered border-secondary table-hover text-center">
                 <thead className="table-dark">
                   <tr>
                     <th>Genre</th>
@@ -389,23 +424,31 @@ const AddSongForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="type" className="form-label">Song Type</label>
+          <label htmlFor="type" className="form-label">
+            Song Type<span style={{ color: "#e55f5f" }}>*</span>
+          </label>
+          <div className="input-group mb-2">
+            <button
+              type="button"
+              className="btn btn-secondary input-group-text"
+              onClick={addSongType}
+            >
+              Add
+            </button>
             <input
               type="text"
               id="type"
               name="type"
               value={typeInput}
               onChange={(e) => setTypeInput(e.target.value)}
-              className="form-control mb-2"
+              className="form-control"
               placeholder="mp3, wav, flac, aac, ogg"
             />
-            <button type="button" className="btn btn-success" onClick={addSongType}>
-              Add Type
-            </button>
+          </div>
 
           {song.type.length === 0 ? "" :
             <div className="table-container">
-              <table className="table table-bordered border-secondary table-striped">
+              <table className="table table-bordered border-secondary table-hover text-center">
                 <thead className="table-dark">
                   <tr>
                     <th>Type</th>
@@ -457,39 +500,39 @@ const AddSongForm = () => {
               checked={song.lyricsData.hasLyrics}
               onChange={handleToggleLyrics}
             />
-            <label className="form-check-label" htmlFor="lyricsToggle">
-              Song has lyrics?
+            <label className="form-check-label fw-bold" htmlFor="lyricsToggle">
+              SONG HAS LYRICS?
             </label>
           </div>
 
           {song.lyricsData.hasLyrics && (
             <>
-
               <div className="mb-3">
+                <label htmlFor="lyrics" className="form-label" style={{ marginTop: "10px", marginRight: "10px" }}>
+                  Lyrics
+                </label>
+                <br />
                 {song.lyricsData.lyrics.map((section, index) => (
-                  <div key={index} className="mb-3">
-                    <input
-                      type="text"
-                      id="lyricsType"
-                      name="lyricsType"
-                      value={section.melody}
-                      onChange={(e) => handleLyricTypeChange(index, e.target.value)}
-                      className="form-control capitalize"
-                      placeholder="Enter melody type"
-                    />
+                  <div key={index} className="input-group mb-2">
+                    <button
+                      type="button"
+                      className="btn btn-danger input-group-text"
+                      onClick={() => removeLyricSection(index)}
+                    >
+                      Remove
+                    </button>
                     <textarea
                       id="lyrics"
-                      value={section.lyricsText.join("\n")}
+                      value={section}
                       className="form-control"
-                      style={{ margin: "10px auto" }}
                       onChange={(e) => handleLyricChange(index, e.target.value)}
-                      placeholder={`Enter ${section.melody} lyrics`}
-                      rows="3"
+                      rows="4"
                     />
-                    <button type="button" className="btn btn-danger" onClick={() => removeLyricSection(index)}>Remove</button>
                   </div>
                 ))}
-                <button type="button" className="btn btn-success" onClick={addLyricSection}>+ Add Lyrics Melody</button>
+                <button type="button" className="btn btn-success" onClick={addLyricSection}>
+                  + Add new section
+                </button>
               </div>
 
               <div className="mb-3">
@@ -511,11 +554,16 @@ const AddSongForm = () => {
                   type="url"
                   id="poweredBy"
                   name="poweredBy"
+                  list="poweredByOptions"
                   value={song.lyricsData?.poweredBy || ""}
                   onChange={handleLyricsKeyChange}
                   className="form-control"
-                  placeholder="Enter URL (eg. https://www.musixmatch.com/)"
+                  placeholder="Enter URL"
+                  autoComplete="on"
                 />
+                <datalist id="poweredByOptions">
+                  <option value="https://www.musixmatch.com" />
+                </datalist>
               </div>
 
             </>
